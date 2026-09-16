@@ -1,0 +1,27 @@
+[package]
+name = "flash-graphql-axum"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "async-graphql-axum re-exported unchanged against a flash_graphql::Schema (flash_graphql::Schema's Executor impl makes this a genuine zero-work re-export, including real HTTP + WebSocket subscriptions — see tests/axum_smoke.rs for the proof)."
+publish = false
+
+[dependencies]
+# Real async-graphql-axum, completely unmodified — this crate's whole point
+# (see `src/lib.rs`'s doc comment) is that its extractors/handlers
+# (`GraphQLRequest`/`GraphQLResponse`/`GraphQLWebSocket`/`GraphQLProtocol`)
+# only ever require `E: async_graphql::Executor`, which
+# `flash_graphql::Schema<Q, M, S>` already implements — so there is nothing
+# of async-graphql-axum's own to patch or wrap.
+async-graphql-axum = "=7.0.17"
+
+[dev-dependencies]
+flash-graphql = { path = "../flash-graphql" }
+axum = { version = "0.8", features = ["ws"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net"] }
+tower = { version = "0.5", features = ["util"] }
+futures-util = { version = "0.3", default-features = false, features = ["std", "alloc", "sink"] }
+http-body-util = "0.1"
+serde_json = "1"
+tokio-tungstenite = "0.28"

@@ -1,0 +1,48 @@
+[package]
+name = "flash-graphql"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Core traits, runtime, and dynamic-schema facade for flash-graphql: a code-first GraphQL library with async-graphql's macro surface, backed by async-graphql's type-erased dynamic engine instead of its monomorphized static derives, for fast incremental rebuilds without giving up compile-time type checking."
+publish = false
+
+[dependencies]
+# Only the `dynamic` engine (+ `dataloader`) is enabled — none of the
+# derive/codegen machinery this crate exists to route around, and none of the
+# default extras (graphiql/playground/tempfile/email-validator) this crate
+# doesn't need yet. `dataloader` is orthogonal to the static-vs-dynamic
+# schema split (see `lib.rs`'s doc comment on the `dataloader` re-export) so
+# it just pulls in async-graphql's own `dataloader::{DataLoader, Loader}`
+# unchanged, gated on nothing but this one Cargo feature.
+async-graphql = { version = "=7.0.17", default-features = false, features = [
+    "dynamic-schema",
+    "dataloader",
+] }
+flash-graphql-derive = { path = "../flash-graphql-derive" }
+futures-util = { version = "0.3", default-features = false, features = ["std", "alloc"] }
+serde = "1"
+# A bare `serde_json::Value` field (as commonly produced by an ORM's JSON
+# column type, e.g. `sea_orm::entity::prelude::Json`) needs its own
+# `OutputType`/`InputType` impl — see `scalar.rs`'s doc comment on
+# `register_json_value`.
+serde_json = "1"
+chrono = { version = "0.4.37", default-features = false, features = [
+    "clock",
+    "std",
+], optional = true }
+# `#[graphql(validator(email))]` support (deferred from an earlier pass,
+# now added) — the same crate (and pinned minor version) real
+# async-graphql's own `email-validator` feature depends on (see
+# `src/validators.rs`'s doc comment). Unconditional, like `dataloader`
+# above: treated as an always-on feature, not a further opt-in knob on top
+# of this crate's own (already optional) `chrono`.
+fast_chemail = "0.9.6"
+
+[features]
+default = []
+chrono = ["dep:chrono"]
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
+serde_json = "1"

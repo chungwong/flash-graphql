@@ -1,0 +1,22 @@
+[package]
+name = "flash-graphql-derive"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Proc macros (Object, SimpleObject, ComplexObject, Enum, InputObject, OneofObject, Interface, MergedObject, Subscription) for flash-graphql, matching async-graphql's own names and attribute syntax so a port from async-graphql is a `use` swap."
+publish = false
+
+[lib]
+proc-macro = true
+
+[dependencies]
+# `full` is required to parse `impl` blocks with method bodies/expressions
+# (`#[Object]`/`#[ComplexObject]` take a whole `ItemImpl`) and to parse
+# `guard`/`default` attribute values as arbitrary Rust expressions.
+# Deliberately NOT `extra-traits` (adds Debug/Eq/Hash to every syn type) —
+# part of why this approach should compile fast, per the plan.
+syn = { version = "2", default-features = false, features = ["full", "printing", "parsing", "clone-impls", "proc-macro"] }
+quote = "1"
+proc-macro2 = "1"
+darling = "0.20"

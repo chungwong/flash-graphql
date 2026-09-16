@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = ["crates/flash-graphql", "crates/flash-graphql-derive", "crates/flash-graphql-axum"]
+
+[workspace.package]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+version = "0.1.0"
+repository = "https://github.com/chungwong/flash-graphql"
+homepage = "https://github.com/chungwong/flash-graphql"
+
+# Vendored async-graphql 7.0.17 with a small, documented patch to its
+# `dynamic` engine (nullable-error isolation + concurrent sibling field
+# resolution) — see vendor/PATCH.md for the exact diff, rationale, and
+# upstreaming notes. `async-graphql-derive`/`-parser`/`-value` are left
+# unpatched, unpinned crates.io deps (only `dynamic/resolve.rs` needed a
+# change).
+[patch.crates-io]
+async-graphql = { path = "vendor/async-graphql-7.0.17" }
